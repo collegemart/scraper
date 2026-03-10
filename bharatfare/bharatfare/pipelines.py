@@ -205,10 +205,18 @@ class DeduplicationPipeline:
                 raise DropItem(f"Duplicate company (normalized): {name} in {city}")
             self.seen_names.add(norm_key)
 
-        # 3. Website domain dedup
+        # 3. Website domain dedup — only for real company websites
         website = adapter.get('company_website') or adapter.get('website') or ''
         domain = self._extract_domain(website)
-        if domain and domain not in ('', 'localhost'):
+        # Skip dedup for: empty domains, directory profile pages, or social media
+        skip_domains = {
+            'indiamart.com', 'dir.indiamart.com', 'tradeindia.com',
+            'exportersindia.com', 'indianyellowpages.com', 'justdial.com',
+            'clutch.co', 'goodfirms.co', 'fundoodata.com', 'sulekha.com',
+            'linkedin.com', 'facebook.com', 'twitter.com',
+        }
+        is_directory_url = any(d in domain for d in skip_domains)
+        if domain and domain not in ('', 'localhost') and not is_directory_url:
             if domain in self.seen_domains:
                 raise DropItem(f"Duplicate domain: {domain} for {name}")
             self.seen_domains.add(domain)

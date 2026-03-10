@@ -1,0 +1,107 @@
+==============================================================
+  BHARATFARE SCRAPER — FRIEND'S LAPTOP SETUP GUIDE
+  Follow every step exactly. Do NOT skip any step.
+==============================================================
+
+STEP 1 — Open Command Prompt
+------------------------------
+Press the Windows key + R on your keyboard.
+Type:  cmd
+Press Enter.
+
+A black window will open. Keep it open for all steps below.
+
+
+STEP 2 — Install Python
+------------------------------
+Copy-paste this command and press Enter:
+
+    winget install Python.Python.3.12 -e
+
+Wait for it to say "Successfully installed".
+Then CLOSE the black window and open a new one (Win+R → cmd → Enter).
+
+
+STEP 3 — Install Git
+------------------------------
+Copy-paste this and press Enter:
+
+    winget install Git.Git -e
+
+Wait for it to say "Successfully installed".
+Then CLOSE the black window and open a new one again.
+
+
+STEP 4 — Download the scraper code
+------------------------------
+Copy-paste these commands ONE BY ONE, pressing Enter after each:
+
+    git clone https://github.com/YOUR_GITHUB_USERNAME/bharatfare-scraper.git
+
+    cd bharatfare-scraper
+
+
+NOTE: Replace YOUR_GITHUB_USERNAME with the actual GitHub username
+      your partner gives you. Keep this window open!
+
+
+STEP 5 — Set up Python environment and install libraries
+------------------------------
+Copy-paste these commands ONE BY ONE:
+
+    python -m venv .venv
+
+    .venv\Scripts\activate
+
+    pip install -r requirements.txt
+
+    playwright install chromium
+
+This step takes 10–20 minutes. Many lines will scroll by — that is normal.
+Wait until you see the cursor blinking again before moving on.
+
+
+STEP 6 — Start the scraper
+------------------------------
+Once Step 5 is completely done, double-click the file:
+
+    run_friends_laptop.bat
+
+(It will be inside the bharatfare-scraper folder on your laptop)
+
+A window will open and it will start running automatically.
+It will say things like "[1/5] Running Fundoodata spider..." etc.
+
+DO NOT close this window. Let it run. It will take 3–5 hours.
+
+
+STEP 7 — When it is done
+------------------------------
+When the window says "ALL DONE! Check your output folder."
+Go into the  bharatfare-scraper\output  folder.
+You will see several .csv files there.
+
+Zip the entire "output" folder (right-click → Send to → Compressed folder)
+and send it to your partner via Google Drive or WhatsApp.
+
+==============================================================
+  THAT IS ALL. Nothing else to install or configure.
+==============================================================
+
+COMMON PROBLEMS:
+
+Problem: "winget is not recognized"
+Fix: Download Python manually from https://www.python.org/downloads/
+     During install, CHECK the box that says "Add Python to PATH".
+
+Problem: "python is not recognized" after installing
+Fix: Close and reopen Command Prompt, then try again.
+
+Problem: pip install fails with an error
+Fix: Run this first:  python -m pip install --upgrade pip
+     Then try:        pip install -r requirements.txt  again.
+
+Problem: playwright install fails
+Fix: Run:  pip install playwright  and then  playwright install chromium
+
+==============================================================
