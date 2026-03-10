@@ -1,0 +1,6 @@
+scrapy==2.11.2
+itemadapter>=0.8
+scrapy-fake-useragent>=1.4
+scrapy-impersonate>=1.0
+scrapy-playwright>=0.0.40
+flask>=3.0

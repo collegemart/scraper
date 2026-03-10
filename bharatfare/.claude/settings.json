@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "C:\\Users\\mrkar\\AppData\\Roaming\\Python\\Python313\\Scripts\\mcp-server-fetch.exe",
+      "args": [
+        "--ignore-robots-txt"
+      ],
+      "description": "Web fetch server - fetches web pages, converts HTML to markdown, extracts content"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp",
+        "--headless"
+      ],
+      "description": "Playwright browser automation - navigate pages, click elements, fill forms, take screenshots, extract data from dynamic JS-rendered pages"
+    }
+  }
+}

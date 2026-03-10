@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BharatFare Scraper</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0f;
+      color: #e2e8f0;
+      min-height: 100vh
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1a1040 100%);
+      border-bottom: 1px solid #1e293b;
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+    .logo { font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em }
+    .logo span { color: #818cf8 }
+    .header-stats { display: flex; gap: 1.5rem; font-size: .8rem; color: #64748b }
+    .header-stats strong { color: #e2e8f0 }
+    .main { max-width: 1200px; margin: 0 auto; padding: 2rem }
+    .scrape-bar {
+      background: linear-gradient(135deg, #1e293b, #1a1e3a);
+      border: 1px solid #334155;
+      border-radius: .75rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem
+    }
+    .scrape-bar h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #c7d2fe }
+    .scrape-form { display: flex; gap: .75rem; align-items: flex-end; flex-wrap: wrap }
+    .input-group { flex: 1; min-width: 250px }
+    .input-group label {
+      display: block; font-size: .7rem; color: #94a3b8;
+      margin-bottom: .25rem; text-transform: uppercase; letter-spacing: .05em
+    }
+    .input-group input {
+      width: 100%; background: #0f172a; color: #e2e8f0;
+      border: 1px solid #475569; padding: .55rem .75rem;
+      border-radius: .5rem; font-size: .9rem; outline: none
+    }
+    .input-group input:focus { border-color: #818cf8; box-shadow: 0 0 0 2px rgba(129,140,248,.2) }
+    .input-sm { width: 80px; min-width: 80px; flex: 0 }
+    .toggle-group { display: flex; gap: .5rem; align-items: center }
+    .toggle-group label { font-size: .75rem; color: #94a3b8 }
+    .toggle {
+      width: 36px; height: 20px; background: #475569; border-radius: 10px;
+      position: relative; cursor: pointer; transition: .2s
+    }
+    .toggle.on { background: #6366f1 }
+    .toggle::after {
+      content: ''; position: absolute; width: 16px; height: 16px;
+      background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: .2s
+    }
+    .toggle.on::after { left: 18px }
+    .btn {
+      padding: .55rem 1.5rem; border: none; border-radius: .5rem;
+      font-size: .85rem; font-weight: 600; cursor: pointer;
+      transition: .15s; white-space: nowrap
+    }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff }
+    .btn-primary:hover { filter: brightness(1.1) }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed }
+    .btn-danger { background: #dc2626; color: #fff }
+    .btn-danger:hover { background: #b91c1c }
+    .btn-ghost { background: transparent; color: #94a3b8; border: 1px solid #334155 }
+    .btn-ghost:hover { color: #e2e8f0; border-color: #64748b }
+    .btn-sm { padding: .3rem .75rem; font-size: .75rem }
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem
+    }
+    .section-head h3 {
+      font-size: .9rem; font-weight: 600; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: .05em
+    }
+    .runs-grid { display: flex; flex-direction: column; gap: .75rem; margin-bottom: 2rem }
+    .run-card {
+      background: #111827; border: 1px solid #1e293b;
+      border-radius: .75rem; padding: 1rem 1.25rem; transition: border-color .15s
+    }
+    .run-card:hover { border-color: #334155 }
+    .run-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem }
+    .run-domain { font-weight: 600; font-size: .95rem }
+    .run-url { font-size: .75rem; color: #64748b; margin-bottom: .6rem; word-break: break-all }
+    .badge {
+      padding: .15rem .6rem; border-radius: 9999px;
+      font-size: .7rem; font-weight: 600; text-transform: uppercase
+    }
+    .badge-running { background: rgba(59,130,246,.15); color: #60a5fa; animation: pulse 2s infinite }
+    .badge-finished { background: rgba(34,197,94,.15); color: #4ade80 }
+    .badge-error { background: rgba(239,68,68,.15); color: #f87171 }
+    .badge-stopped { background: rgba(251,191,36,.15); color: #fbbf24 }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .run-progress {
+      height: 4px; background: #1e293b; border-radius: 2px;
+      margin-bottom: .6rem; overflow: hidden
+    }
+    .run-progress-bar {
+      height: 100%; background: linear-gradient(90deg, #6366f1, #a78bfa);
+      border-radius: 2px; transition: width .5s ease
+    }
+    .run-progress-bar.done { background: linear-gradient(90deg, #22c55e, #16a34a) }
+    .run-progress-bar.err { background: #ef4444 }
+    .run-stats { display: flex; gap: 1.5rem; font-size: .75rem; color: #64748b; flex-wrap: wrap }
+    .run-stats strong { color: #e2e8f0 }
+    .run-actions { display: flex; gap: .5rem; margin-top: .6rem }
+    .data-section { margin-bottom: 2rem }
+    .table-wrap {
+      background: #111827; border: 1px solid #1e293b;
+      border-radius: .75rem; overflow: hidden
+    }
+    .table-scroll { overflow-x: auto; max-height: 500px; overflow-y: auto }
+    table { width: 100%; border-collapse: collapse; font-size: .8rem }
+    th {
+      position: sticky; top: 0; background: #1e293b; color: #94a3b8;
+      text-align: left; padding: .6rem .75rem; font-weight: 600;
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap
+    }
+    td {
+      padding: .5rem .75rem; border-top: 1px solid #1e293b;
+      color: #cbd5e1; max-width: 250px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap
+    }
+    tr:hover td { background: rgba(99,102,241,.05) }
+    .files-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .75rem
+    }
+    .file-card {
+      background: #111827; border: 1px solid #1e293b;
+      border-radius: .75rem; padding: 1rem;
+      display: flex; justify-content: space-between; align-items: center
+    }
+    .file-name { font-weight: 500; font-size: .85rem; word-break: break-all }
+    .file-meta { font-size: .7rem; color: #64748b; margin-top: .2rem }
+    .empty { text-align: center; color: #475569; padding: 2rem; font-size: .85rem }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">Bharat<span>Fare</span> Scraper</div>
+    <div class="header-stats">
+      <span>Active: <strong id="h-active">0</strong></span>
+      <span>Total Items: <strong id="h-items">0</strong></span>
+    </div>
+  </div>
+  <div class="main">
+    <div class="scrape-bar">
+      <h2>Scrape Any Website</h2>
+      <div class="scrape-form">
+        <div class="input-group">
+          <label>URL</label>
+          <input type="text" id="inp-url" placeholder="https://example.com" onkeydown="if(event.key==='Enter')startScrape()">
+        </div>
+        <div class="input-group input-sm">
+          <label>Pages</label>
+          <input type="number" id="inp-pages" value="50" min="1" max="1000">
+        </div>
+        <div class="input-group input-sm">
+          <label>Depth</label>
+          <input type="number" id="inp-depth" value="2" min="0" max="10">
+        </div>
+        <div style="display:flex;gap:1rem;align-items:flex-end;padding-bottom:2px">
+          <div class="toggle-group">
+            <label>Follow</label>
+            <div class="toggle on" id="tog-follow" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="toggle-group">
+            <label>Scroll</label>
+            <div class="toggle on" id="tog-scroll" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-scrape" onclick="startScrape()">Scrape</button>
+      </div>
+    </div>
+    <div class="section-head"><h3>Scrape Runs</h3></div>
+    <div class="runs-grid" id="runs-grid">
+      <div class="empty">No scrape runs yet. Enter a URL above to start.</div>
+    </div>
+    <div class="data-section" id="data-section" style="display:none">
+      <div class="section-head">
+        <h3>Data Preview <span id="preview-label" style="color:#818cf8;font-size:.8rem;text-transform:none;letter-spacing:0"></span></h3>
+        <button class="btn btn-ghost btn-sm" onclick="closePreview()">Close</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-scroll" id="table-scroll">
+          <table id="data-table"><thead></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="section-head"><h3>Output Files</h3></div>
+    <div class="files-grid" id="files-grid">
+      <div class="empty">No output files yet.</div>
+    </div>
+  </div>
+  <script>
+    let runs=[], sseSource=null, previewRunId=null, previewInterval=null;
+    function fmt(s){if(s==null)return'--';s=Math.round(s);const m=Math.floor(s/60),sec=s%60;return m>0?m+'m '+sec+'s':sec+'s'}
+    function fmtSize(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
+
+    async function startScrape(){
+      const url=document.getElementById('inp-url').value.trim();
+      if(!url){document.getElementById('inp-url').focus();return}
+      const btn=document.getElementById('btn-scrape');
+      btn.disabled=true;btn.textContent='Starting...';
+      try{
+        await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({url,
+            max_pages:parseInt(document.getElementById('inp-pages').value)||50,
+            depth:parseInt(document.getElementById('inp-depth').value)||2,
+            follow:document.getElementById('tog-follow').classList.contains('on')?'true':'false',
+            scroll:document.getElementById('tog-scroll').classList.contains('on')?'true':'false'
+          })});
+        document.getElementById('inp-url').value='';
+        await loadRuns();
+      }catch(e){console.error(e)}
+      btn.disabled=false;btn.textContent='Scrape';
+    }
+    async function stopRun(id){await fetch('/api/runs/'+id+'/stop',{method:'POST'});await loadRuns()}
+    async function deleteRun(id){await fetch('/api/runs/'+id+'/delete',{method:'POST'});await loadRuns()}
+
+    function viewData(id,domain){
+      previewRunId=id;
+      document.getElementById('preview-label').textContent='- '+domain;
+      document.getElementById('data-section').style.display='block';
+      loadItems(id);
+      if(previewInterval)clearInterval(previewInterval);
+      previewInterval=setInterval(()=>loadItems(id),4000);
+    }
+    function closePreview(){
+      previewRunId=null;
+      document.getElementById('data-section').style.display='none';
+      if(previewInterval){clearInterval(previewInterval);previewInterval=null}
+    }
+    async function loadItems(id){
+      try{const res=await fetch('/api/runs/'+id+'/items?limit=50');renderTable(await res.json())}catch(e){console.error(e)}
+    }
+    function renderTable(rows){
+      const thead=document.querySelector('#data-table thead'),tbody=document.querySelector('#data-table tbody');
+      if(!rows.length){thead.innerHTML='';tbody.innerHTML='<tr><td colspan="99" class="empty">No data yet</td></tr>';return}
+      const keys=[],seen=new Set();
+      const priority=['name','title','email','phone','price','url','detail_url','address','city','location','description','rating','category','type','source_url','source_domain','scraped_at'];
+      for(const pk of priority){for(const row of rows){if(row[pk]&&row[pk].trim()&&!seen.has(pk)){keys.push(pk);seen.add(pk);break}}}
+      for(const row of rows){for(const k of Object.keys(row)){if(!seen.has(k)&&row[k]&&row[k].trim()){keys.push(k);seen.add(k)}}}
+      thead.innerHTML='<tr>'+keys.map(k=>'<th>'+k.replace(/_/g,' ')+'</th>').join('')+'</tr>';
+      tbody.innerHTML=rows.map(row=>'<tr>'+keys.map(k=>{
+        const v=(row[k]||'').trim();
+        if(v.startsWith('http'))return'<td><a href="'+v+'" target="_blank" style="color:#818cf8">'+v.substring(0,40)+'...</a></td>';
+        return'<td title="'+v+'">'+v+'</td>';
+      }).join('')+'</tr>').join('');
+    }
+
+    function renderRuns(data){
+      runs=data;const grid=document.getElementById('runs-grid');
+      const active=data.filter(r=>r.status==='running').length;
+      const totalItems=data.reduce((s,r)=>s+(r.items_scraped||0),0);
+      document.getElementById('h-active').textContent=active;
+      document.getElementById('h-items').textContent=totalItems.toLocaleString();
+      if(!data.length){grid.innerHTML='<div class="empty">No scrape runs yet. Enter a URL above to start.</div>';return}
+      grid.innerHTML=data.map(r=>{
+        const bcls={running:'badge-running',finished:'badge-finished',error:'badge-error',stopped:'badge-stopped'}[r.status]||'badge-stopped';
+        const pbarCls=r.status==='finished'?'done':r.status==='error'?'err':'';
+        return'<div class="run-card"><div class="run-top"><span class="run-domain">'+r.domain+'</span><span class="badge '+bcls+'">'+r.status+'</span></div>'
+          +'<div class="run-url">'+r.url+'</div>'
+          +'<div class="run-progress"><div class="run-progress-bar '+pbarCls+'" style="width:'+r.progress+'%"></div></div>'
+          +'<div class="run-stats">'
+          +'<span>Pages: <strong>'+r.pages_crawled+'</strong></span>'
+          +'<span>Items: <strong>'+(r.items_scraped||0).toLocaleString()+'</strong></span>'
+          +'<span>Speed: <strong>'+r.items_per_min+'/min</strong></span>'
+          +'<span>Elapsed: <strong>'+fmt(r.elapsed)+'</strong></span>'
+          +'<span>ETA: <strong>'+(r.eta_seconds!=null?'~'+fmt(r.eta_seconds):'--')+'</strong></span>'
+          +'</div><div class="run-actions">'
+          +(r.status==='running'?'<button class="btn btn-danger btn-sm" onclick="stopRun(\''+r.id+'\')">Stop</button>':'<button class="btn btn-ghost btn-sm" onclick="deleteRun(\''+r.id+'\')">Remove</button>')
+          +'<button class="btn btn-ghost btn-sm" onclick="viewData(\''+r.id+'\',\''+r.domain+'\')">View Data</button>'
+          +'</div></div>';
+      }).join('');
+    }
+
+    async function loadRuns(){try{renderRuns(await(await fetch('/api/runs')).json())}catch(e){console.error(e)}}
+    async function loadFiles(){
+      try{
+        const files=await(await fetch('/api/files')).json();
+        const grid=document.getElementById('files-grid');
+        if(!files.length){grid.innerHTML='<div class="empty">No output files yet.</div>';return}
+        grid.innerHTML=files.map(f=>'<div class="file-card"><div><div class="file-name">'+f.name+'</div><div class="file-meta">'+f.rows+' rows &middot; '+fmtSize(f.size)+'</div></div><a href="/api/files/'+f.name+'/download" class="btn btn-ghost btn-sm">Download</a></div>').join('');
+      }catch(e){console.error(e)}
+    }
+    function connectSSE(){
+      sseSource=new EventSource('/api/events');
+      sseSource.onmessage=function(e){renderRuns(JSON.parse(e.data))};
+      sseSource.onerror=function(){sseSource.close();setTimeout(connectSSE,5000)};
+    }
+    loadRuns();loadFiles();connectSSE();setInterval(loadFiles,15000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      width: 480px;
+      max-height: 600px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e293b, #1a1040);
+      padding: .8rem 1rem;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1rem;
+      font-weight: 700
+    }
+
+    .logo span {
+      color: #818cf8
+    }
+
+    .badge {
+      font-size: .65rem;
+      padding: .15rem .5rem;
+      background: rgba(99, 102, 241, .15);
+      color: #818cf8;
+      border-radius: 9999px;
+      font-weight: 600
+    }
+
+    .body {
+      padding: 1rem
+    }
+
+    .btn {
+      width: 100%;
+      padding: .6rem;
+      border: none;
+      border-radius: .5rem;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .btn-extract {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      margin-bottom: .75rem
+    }
+
+    .btn-extract:hover {
+      filter: brightness(1.1)
+    }
+
+    .btn-extract:disabled {
+      opacity: .5;
+      cursor: wait
+    }
+
+    .status {
+      text-align: center;
+      padding: .5rem;
+      font-size: .8rem;
+      color: #94a3b8;
+      margin-bottom: .75rem
+    }
+
+    .status.success {
+      color: #4ade80
+    }
+
+    .status.error {
+      color: #f87171
+    }
+
+    .stats {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: .75rem
+    }
+
+    .stat-box {
+      flex: 1;
+      background: #1e293b;
+      border-radius: .5rem;
+      padding: .5rem;
+      text-align: center
+    }
+
+    .stat-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #c7d2fe
+    }
+
+    .stat-label {
+      font-size: .65rem;
+      color: #64748b;
+      text-transform: uppercase
+    }
+
+    .actions {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: .75rem
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: .45rem;
+      border: 1px solid #334155;
+      border-radius: .5rem;
+      background: transparent;
+      color: #94a3b8;
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s
+    }
+
+    .btn-action:hover {
+      color: #e2e8f0;
+      border-color: #818cf8
+    }
+
+    .btn-action:disabled {
+      opacity: .3;
+      cursor: default
+    }
+
+    .preview {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: .5rem;
+      overflow: hidden;
+      max-height: 300px;
+      display: none
+    }
+
+    .preview.show {
+      display: block
+    }
+
+    .preview-scroll {
+      overflow: auto;
+      max-height: 300px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .7rem
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #1e293b;
+      color: #94a3b8;
+      text-align: left;
+      padding: .35rem .5rem;
+      font-weight: 600;
+      font-size: .6rem;
+      text-transform: uppercase;
+      white-space: nowrap
+    }
+
+    td {
+      padding: .3rem .5rem;
+      border-top: 1px solid #1e293b;
+      color: #cbd5e1;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    tr:hover td {
+      background: rgba(99, 102, 241, .08)
+    }
+
+    .empty {
+      text-align: center;
+      padding: 1.5rem;
+      color: #475569;
+      font-size: .8rem
+    }
+
+    .source-tag {
+      display: inline-block;
+      font-size: .6rem;
+      padding: .1rem .4rem;
+      background: rgba(99, 102, 241, .1);
+      color: #818cf8;
+      border-radius: 4px;
+      margin-right: .3rem
+    }
+
+    .breakdown {
+      font-size: .7rem;
+      color: #64748b;
+      margin-bottom: .5rem;
+      line-height: 1.6
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="logo">Bharat<span>Fare</span> Extractor</div>
+    <span class="badge">v1.0</span>
+  </div>
+  <div class="body">
+    <button class="btn btn-extract" id="btn-extract">Extract Data From This Page</button>
+    <div class="status" id="status"></div>
+
+    <div class="stats" id="stats" style="display:none">
+      <div class="stat-box">
+        <div class="stat-val" id="st-total">0</div>
+        <div class="stat-label">Items</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="st-fields">0</div>
+        <div class="stat-label">Fields</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="st-source">-</div>
+        <div class="stat-label">Source</div>
+      </div>
+    </div>
+
+    <div class="breakdown" id="breakdown" style="display:none"></div>
+
+    <div class="actions" id="actions" style="display:none">
+      <button class="btn-action" id="btn-csv" disabled>Download CSV</button>
+      <button class="btn-action" id="btn-json" disabled>Download JSON</button>
+      <button class="btn-action" id="btn-copy" disabled>Copy to Clipboard</button>
+    </div>
+
+    <div class="preview" id="preview">
+      <div class="preview-scroll" id="preview-scroll">
+        <table id="data-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
